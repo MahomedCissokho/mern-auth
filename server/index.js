@@ -2,6 +2,8 @@ import express from 'express';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import cookieParser from 'cookie-parser'
+import authRoute from './routes/AuthRoute.mjs'
 
 const app = express()
 
@@ -22,10 +24,15 @@ app.listen(PORT, () => {
 
 app.use(cors(
     {
-        origin: 'http://localhost:'+PORT,
+        origin: `http://localhost:${PORT}`,
         methods:['GET', 'POST', 'PUT', 'DELETE', 'UPDATE'],
         credentials: true
     }
 ))
+
+app.use(cookieParser())
 app.use(express.json())
+
+app.use('/', authRoute)
+
 
