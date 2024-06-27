@@ -23,16 +23,20 @@ const SignUp = async (req, res) => {
     }
 }
 
-const SignIn = async(req, res) => {
+const SignIn = async(req, res, next) => {
 
     try{
         const {username, password} = req.body
         const user = await User.findOne({username})
-        const auth = await bcrypt.compare(password, user.password)
-    
-        if(!user || !auth)
+        
+        if(!user)
             return res.json({message : 'Username or Password not found'})
-    
+        
+        const auth = await bcrypt.compare(password, user.password)
+        
+        if(!auth)
+            return res.json({message : 'Username or Password not found'})
+
         const token = secreToken(user._id)
         res.cookie("token", token, {
             httpOnly: false,
@@ -40,6 +44,7 @@ const SignIn = async(req, res) => {
         })
     
         res.status(200).json({message : 'User logged in successfully', success : true})
+        next()
 
     }catch(error){
         console.log(error)
